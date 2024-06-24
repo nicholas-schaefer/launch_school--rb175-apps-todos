@@ -39,28 +39,62 @@ def error_for_list_index(index)
   end
 end
 
-# View single lists
-get "/lists/:list_id" do
-
-  @lists = session[:lists]
-  list_id = params[:list_id]
-
-  error = error_for_list_index(list_id)
-  if error
-    session[:error] = error
-    erb :list, layout: :layout
-  else
-    @list = @lists[list_id.to_i]
-    erb :list, layout: :layout
-  end
-end
-
 # Return an error message if the name is invalid. Return nil if the name is valid
 def error_for_list_name(name)
   if !(1..100).cover? name.size
     "List name must be between 1 and 100 characters"
   elsif session[:lists].any?{ |list| list[:name] == name }
     "List name must be unique"
+  end
+end
+
+# View single lists
+get "/lists/:list_id" do
+
+  @lists = session[:lists]
+  @list_id = params[:list_id]
+
+  error = error_for_list_index(@list_id)
+  if error
+    session[:error] = error
+    erb :list, layout: :layout
+  else
+    @list = @lists[@list_id.to_i]
+    erb :list, layout: :layout
+  end
+end
+
+# Update an existing todo list
+post "/lists/:list_id" do
+  list_name = params[:list_name].strip
+  @lists = session[:lists]
+  @list_id = params[:list_id]
+  @list = @lists[@list_id.to_i]
+
+  error = error_for_list_name(list_name)
+  if error
+    session[:error] = error
+    erb :edit_list, layout: :layout
+  else
+    @list[:name] = list_name
+    session[:success] = "The list has been updated."
+    redirect "/lists/#{@list_id}"
+  end
+end
+
+# Edit an existing to do list
+get "/lists/:list_id/edit" do
+
+  @lists = session[:lists]
+  @list_id = params[:list_id]
+
+  error = error_for_list_index(@list_id)
+  if error
+    session[:error] = error
+    erb :list, layout: :layout
+  else
+    @list = @lists[@list_id.to_i]
+    erb :edit_list, layout: :layout
   end
 end
 
