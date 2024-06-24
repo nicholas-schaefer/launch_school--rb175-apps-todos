@@ -135,6 +135,24 @@ post "/lists/:list_id/destroy" do
   end
 end
 
+# Delete a todo from a list
+post "/lists/:list_id/todos/:todo_id/destroy" do
+  @lists = session[:lists]
+  @list_id = params[:list_id]
+  @list = @lists[@list_id.to_i]
+
+  if !!(@list[:todos].delete_at(params[:todo_id].to_i))
+    session[:success] = "The todo was deleted."
+    redirect "/lists/#{@list_id}"
+    # erb :list, layout: :layout
+  else
+    redirect "/lists/#{@list_id}"
+    # erb :list, layout: :layout
+  end
+
+end
+
+
 # Edit an existing to do list
 get "/lists/:list_id/edit" do
 
