@@ -82,6 +82,24 @@ post "/lists/:list_id" do
   end
 end
 
+# Delete an existing to do list
+post "/lists/:list_id/destroy" do
+
+  @lists = session[:lists]
+  @list_id = params[:list_id]
+
+  error = error_for_list_index(@list_id)
+  if error
+    session[:error] = error
+    erb :list, layout: :layout
+  else
+
+    @lists.delete_at(@list_id.to_i)
+    session[:success] = "The list has been deleted."
+    redirect "/lists"
+  end
+end
+
 # Edit an existing to do list
 get "/lists/:list_id/edit" do
 
