@@ -32,6 +32,11 @@ def is_i?(a_string)
   !!(a_string =~ /\A[-+]?[0-9]+\z/)
 end
 
+# Return a boolean true value if string size is within character range
+def within_character_range?(str)
+  (1..100).cover? str.size
+end
+
 # Return an error message if the list index is invalid. Return nil if the name is valid
 def error_for_list_index(index)
   if (!is_i?(index)) || (!(0...@lists.size).cover? index.to_i)
@@ -39,9 +44,16 @@ def error_for_list_index(index)
   end
 end
 
+# Return an error message if the todo item is invalid. Return nil if the todo item is valid
+def error_for_todo_item(todo)
+  if !within_character_range?(todo)
+    "Todo item name must be between 1 and 100 characters"
+  end
+end
+
 # Return an error message if the name is invalid. Return nil if the name is valid
 def error_for_list_name(name)
-  if !(1..100).cover? name.size
+  if !within_character_range?(name)
     "List name must be between 1 and 100 characters"
   elsif session[:lists].any?{ |list| list[:name] == name }
     "List name must be unique"
@@ -64,6 +76,7 @@ get "/lists/:list_id" do
   end
 end
 
+
 # Update an existing todo list
 post "/lists/:list_id" do
   list_name = params[:list_name].strip
@@ -79,6 +92,28 @@ post "/lists/:list_id" do
     @list[:name] = list_name
     session[:success] = "The list has been updated."
     redirect "/lists/#{@list_id}"
+  end
+end
+
+# Adding a new todo to a list
+post "/lists/:list_id/todos" do
+  @lists = session[:lists]
+  @list_id = params[:list_id]
+  @todo = params[:todo]
+  @list = @lists[@list_id.to_i]
+  # params[:todo]
+
+  error = error_for_todo_item(@todo.strip)
+  if error
+    session[:error] = "Todo must be between 1 and 100 characters."
+    erb :list, layout: :layout
+  else
+    session[:success] = "The todo was added."
+    @list[:todos] << {name: @todo.strip, completed: false}
+    @todo = nil
+    erb :list, layout: :layout
+    # erb "<pre>#{@list}</pre>"
+    # redirect "/lists/#{@list_id}"
   end
 end
 
