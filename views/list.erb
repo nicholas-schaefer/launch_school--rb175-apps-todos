@@ -9,14 +9,13 @@
 </section>
 <% end %>
 
-
-<form action ="/lists" method ="post">
+<form action="/lists/<%= @list_id %>/todos" method="post">
   <dl>
     <dt>
-      <label for="list_name">Enter a new todo item:</label
+      <label for="todo">Enter a new todo item:</label>
     </dt>
     <dd>
-      <input name="list_name" placeholder="Todo text" type="text value">
+      <input name="todo" id="todo" placeholder="Something to do" type="text" value="">
     </dd>
   </dl>
   <fieldset class="actions">
