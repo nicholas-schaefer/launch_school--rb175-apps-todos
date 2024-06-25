@@ -117,6 +117,30 @@ post "/lists/:list_id/todos" do
   end
 end
 
+# Check/Uncheck a todo list item
+post "/lists/:list_id/todos/:todo_id" do
+  lists = session[:lists]
+  list_id = params[:list_id]
+  list = lists[list_id.to_i]
+
+  todos = list[:todos]
+  todo = todos[params[:todo_id].to_i]
+  # todo[:completed] = !todo[:completed]
+
+  form_completed_boolean =
+    case params[:completed]
+    when "true"   then true
+    when "false"  then false
+    else raise StandardError.new "something went wrong"
+    end
+
+  todo[:completed] = form_completed_boolean
+
+
+  session[:success] = "The todo has been updated"
+  redirect "/lists/#{list_id}"
+end
+
 # Delete an existing to do list
 post "/lists/:list_id/destroy" do
 
