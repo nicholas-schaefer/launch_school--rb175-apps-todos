@@ -3,6 +3,13 @@
   <header>
     <h2><%= @list[:name] %></h2>
     <ul>
+    <% if @todos_count > 0 %>
+      <li>
+        <form action="/lists/<%= @list_id %>/complete_all" method="post">
+          <button class="check" type="submit">Complete All</button>
+        </form>
+      </li>
+     <% end %>
       <li><a class="edit" href="/lists/<%= @list_id %>/edit">Edit List</a></li>
     </ul>
   </header>
@@ -16,6 +23,7 @@
         <button type="submit">Complete</button>
       </form>
       <h3><%= todo[:name] %></h3>
+      <p><%= @todos_count %></p>
       <form action="/lists/<%= @list_id %>/todos/<%= idx %>/destroy" method="post" class="delete">
         <button type="submit">Delete</button>
       </form>

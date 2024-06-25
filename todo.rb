@@ -72,6 +72,7 @@ get "/lists/:list_id" do
     erb :list, layout: :layout
   else
     @list = @lists[@list_id.to_i]
+    @todos_count = @list[:todos].size
     erb :list, layout: :layout
   end
 end
@@ -111,9 +112,7 @@ post "/lists/:list_id/todos" do
     session[:success] = "The todo was added."
     @list[:todos] << {name: @todo.strip, completed: false}
     @todo = nil
-    erb :list, layout: :layout
-    # erb "<pre>#{@list}</pre>"
-    # redirect "/lists/#{@list_id}"
+    redirect "/lists/#{@list_id}"
   end
 end
 
@@ -138,6 +137,23 @@ post "/lists/:list_id/todos/:todo_id" do
 
 
   session[:success] = "The todo has been updated"
+  redirect "/lists/#{list_id}"
+end
+
+# Check All todo list items
+post "/lists/:list_id/complete_all" do
+
+  lists = session[:lists]
+  list_id = params[:list_id]
+  list = lists[list_id.to_i]
+
+  todos = list[:todos]
+  # [{:name=>"hi", :completed=>false}, {:name=>"there", :completed=>false}]
+  todos.each do |todo|
+    todo[:completed] = true
+  end
+
+  # erb "<pre>#{todos}</pre>"
   redirect "/lists/#{list_id}"
 end
 
