@@ -1,13 +1,16 @@
 <p>You have <%= @lists.length %> lists.</p>
 
 <ul id="lists">
-  <% @lists.each_with_index do |list, idx| %>
-    <li>
-      <a href="/lists/<%= idx %>">
-        <h2><%= list[:name] %></h2>
-        <p><%= list[:todos].size %></p>
-      </a>
-    </li>
+  <% 2.times do |int| %>
+    <% @lists.each_with_index do |list, idx| %>
+      <% next if uncompleted_todos_count(list[:todos]).zero? == int.even? %>
+      <li <%= 'class=complete' if all_todos_completed?(list[:todos])%>>
+        <a href="/lists/<%= idx %>">
+          <h2><%= list[:name] %></h2>
+          <p><%= uncompleted_todos_count(list[:todos]) %> / <%= list[:todos].size %></p>
+        </a>
+      </li>
+    <% end %>
   <% end %>
 </ul>
 

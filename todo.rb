@@ -3,6 +3,21 @@ require "sinatra/reloader"
 require 'sinatra/content_for'
 require "tilt/erubis"
 
+helpers do
+  def all_todos_completed?(todos)
+    todos.all?{ |todo| todo[:completed] }
+  end
+
+  def any_uncompleted_todos?(todos)
+    return false if todos.size.zero?
+    todos.any?{ |todo| todo[:completed] == false }
+  end
+
+  def uncompleted_todos_count(todos)
+    todos.reject{ |todo| todo[:completed] }.size
+  end
+end
+
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)
@@ -154,6 +169,7 @@ post "/lists/:list_id/complete_all" do
   end
 
   # erb "<pre>#{todos}</pre>"
+  session[:success] = "All todos have been updated to completed"
   redirect "/lists/#{list_id}"
 end
 

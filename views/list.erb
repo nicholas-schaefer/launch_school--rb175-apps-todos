@@ -1,9 +1,9 @@
-<section id="todos">
+<section id="todos" <%= 'class=complete' if all_todos_completed?(@list[:todos]) %>>
   <% if @list %>
   <header>
     <h2><%= @list[:name] %></h2>
     <ul>
-    <% if @todos_count > 0 %>
+    <% if any_uncompleted_todos?(@list[:todos]) %>
       <li>
         <form action="/lists/<%= @list_id %>/complete_all" method="post">
           <button class="check" type="submit">Complete All</button>
@@ -16,18 +16,20 @@
   <% end %>
 
   <ul>
-  <% @list[:todos].each_with_index do |todo, idx|%>
-    <li <%= 'class=complete' if todo[:completed] %>>
-      <form action="/lists/<%= @list_id %>/todos/<%= idx %>" method="post" class="check">
-        <input type="hidden" name="completed" value=<%= !todo[:completed] %>>
-        <button type="submit">Complete</button>
-      </form>
-      <h3><%= todo[:name] %></h3>
-      <p><%= @todos_count %></p>
-      <form action="/lists/<%= @list_id %>/todos/<%= idx %>/destroy" method="post" class="delete">
-        <button type="submit">Delete</button>
-      </form>
-    </li>
+  <% 2.times do |int| %>
+    <% @list[:todos].each_with_index do |todo, idx|%>
+      <% next if todo[:completed] == int.even? %>
+      <li <%= 'class=complete' if todo[:completed] %>>
+        <form action="/lists/<%= @list_id %>/todos/<%= idx %>" method="post" class="check">
+          <input type="hidden" name="completed" value=<%= !todo[:completed] %>>
+          <button type="submit">Complete</button>
+        </form>
+        <h3><%= todo[:name] %></h3>
+        <form action="/lists/<%= @list_id %>/todos/<%= idx %>/destroy" method="post" class="delete">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% end %>
   <% end %>
   </ul>
 </section>
