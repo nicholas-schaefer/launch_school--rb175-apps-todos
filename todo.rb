@@ -178,14 +178,11 @@ post "/lists/:list_id/destroy" do
 
   @lists = session[:lists]
   @list_id = params[:list_id]
+  @lists.delete_at(@list_id.to_i)
 
-  error = error_for_list_index(@list_id)
-  if error
-    session[:error] = error
-    erb :list, layout: :layout
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    "/lists"
   else
-
-    @lists.delete_at(@list_id.to_i)
     session[:success] = "The list has been deleted."
     redirect "/lists"
   end
@@ -196,16 +193,15 @@ post "/lists/:list_id/todos/:todo_id/destroy" do
   @lists = session[:lists]
   @list_id = params[:list_id]
   @list = @lists[@list_id.to_i]
+  todo_id = params[:id].to_i
+  @list[:todos].delete_at todo_id
 
-  if !!(@list[:todos].delete_at(params[:todo_id].to_i))
-    session[:success] = "The todo was deleted."
-    redirect "/lists/#{@list_id}"
-    # erb :list, layout: :layout
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    status 204
   else
+    session[:success] = "The todo has been deleted."
     redirect "/lists/#{@list_id}"
-    # erb :list, layout: :layout
   end
-
 end
 
 
